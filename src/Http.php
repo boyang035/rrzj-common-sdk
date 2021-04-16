@@ -1,0 +1,175 @@
+<?php
+
+
+namespace rrzj\common;
+/**
+ * Class Http.
+ */
+use GuzzleHttp\Client;
+
+class Http
+{
+    private static $client = null;
+    /**
+     * The middlewares.
+     *
+     * @var array
+     */
+    protected $middlewares = [];
+
+    public static function getClient(array $config = [])
+    {
+        if(self::$client == null){
+            self::$client = new Client($config);
+        }
+        return self::$client;
+    }
+    /**
+     * Return all middlewares.
+     *
+     * @return array
+     */
+    public function getMiddlewares()
+    {
+        return $this->middlewares;
+    }
+
+    /**
+     * @param $url
+     * @param array $args
+     * @param array $otherArgs
+     * @return string
+     */
+    public static function get($url,$args = null,$otherArgs = [])
+    {
+        is_string($args) && parse_str($args,$args);
+        $args = array_merge([
+            'verify' => false,
+            'query' => $args,
+            'headers' => [
+                'referer' => $url,
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+            ]
+        ],$otherArgs);
+        $client = self::getClient();
+        $response = $client->request('GET', $url,$args);
+        return (string)$response->getBody();
+    }
+
+    /**
+     * @param $url
+     * @param array $args
+     * @param array $otherArgs
+     * @return string
+     */
+    public static function post($url,$args = null,$otherArgs = [])
+    {
+        is_string($args) && parse_str($args,$args);
+        $args = array_merge([
+            'verify' => false,
+            'form_params' => $args,
+            'headers' => [
+                'referer' => $url,
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+            ]
+        ],$otherArgs);
+        $client = self::getClient();
+        $response = $client->request('Post', $url,$args);
+        return (string)$response->getBody();
+    }
+
+    /**
+     *
+     * @param string $method
+     * @param $url
+     * @param array $args
+     * @param array $otherArgs
+     * @return string
+     */
+    public static function request($method,$url,$args = null,$otherArgs = [])
+    {
+        $method = mb_strtoupper($method);
+        $argType = $method == 'GET' ? 'query' : 'form_params';
+        is_string($args) && parse_str($args,$args);
+        $args = array_merge([
+            'verify' => false,
+            $argType => $args,
+            'headers' => [
+                'referer' => $url,
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+            ]
+        ],$otherArgs);
+        $client = self::getClient();
+        $response = $client->request($method, $url,$args);
+        return (string)$response->getBody();
+    }
+
+
+
+    public static function getJson($url, $args = null, $otherArgs = [])
+    {
+        $data = self::get($url, $args , $otherArgs);
+        return json_decode($data,JSON_UNESCAPED_UNICODE);
+    }
+
+
+
+    /**
+     * @param $url
+     * @param null $raw
+     * @param array $otherArgs
+     * @return string
+     */
+    public static function postRaw($url, $raw = null, $otherArgs = [])
+    {
+        is_array($raw) && $raw = json_encode($raw);
+        $args = array_merge([
+            'verify' => false,
+            'body' => $raw,
+            'headers' => [
+                'referer' => $url,
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+            ]
+        ],$otherArgs);
+        $client = self::getClient();
+        $response = $client->request('Post', $url,$args);
+        return (string)$response->getBody();
+    }
+
+    /**
+     * @param $url
+     * @param null $args
+     * @param array $otherArgs
+     * @return string
+     */
+    public static function postJson($url, $args = null, $otherArgs = [])
+    {
+        is_string($args) && parse_str($args,$args);
+        $args = array_merge([
+            'verify' => false,
+            'json' => $args,
+            'headers' => [
+                'referer' => $url,
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+            ]
+        ],$otherArgs);
+        $client = self::getClient();
+        $response = $client->request('Post', $url,$args);
+        return (string)$response->getBody();
+    }
+
+    /**
+     * @param $url
+     * @param $filePath
+     * @param null $args
+     * @param array $otherArgs
+     * @return string
+     */
+    public static function download($url,$filePath,$args = null,$otherArgs = [])
+    {
+        $otherArgs = array_merge($otherArgs,[
+            'sink' => $filePath,
+        ]);
+        return self::get($url,$args,$otherArgs);
+    }
+}

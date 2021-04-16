@@ -1,0 +1,21 @@
+{
+    "name": "rrzj/common-sdk",
+    "description": "common servers",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "bob",
+            "email": "349613156@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "hanson/foundation-sdk": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "rrzj\\common\\": "src/"
+        }
+    }
+}
