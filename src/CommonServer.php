@@ -9,7 +9,7 @@ use Hanson\Foundation\Foundation;
  *
  * @property \rrzj\common\User\User $user
  */
-class Eleme extends Foundation
+class CommonServer extends Foundation
 {
     protected $providers = [
         ServiceProviders\UserServiceProvider::class,
